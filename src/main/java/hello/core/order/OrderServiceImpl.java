@@ -57,4 +57,6 @@ public class OrderServiceImpl implements OrderService {
             애플리케이션이 어떻게 동작해야 할지 전체 구성을 책임진다.
         이제 각 배우들(OrderServiceImpl)은 담당 기능을 실행하는 책임만 지면 된다.
 
+
+        AppConfig의 등장으로 사용 영역(OrderServiceImpl, DiscountPolicy..)과 구성 영역(AppConfig)으로 분리됨
     */
