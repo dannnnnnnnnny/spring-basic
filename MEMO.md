@@ -50,3 +50,44 @@
   - @Bean 어노테이션이 붙은 메서드를 모두 호출해서 반환된 객체를 스프링 컨테이너에 등록함 (스프링 컨테이너에 등록된 객체를 스프링 빈이라고 함)
 - 스프링 빈은 @Bean 어노테이션이 붙은 메서드명을 그대로 스프링 빈 이름으로 사용함
 - 스프링 빈은 applicationContext.getBean() 메서드를 사용해서 찾을 수 있음
+
+#### 스프링 빈 조회 - 상속관계
+- 부모 타입으로 조회시 자식 타입도 함께 조회됨
+- 자바 객체의 최고 부모인 Object 타입으로 조회하면 모든 스프링 빈을 조회함
+
+### BeanFactory, ApplicationContext
+- AnnotationConfig, AnnotationContext -> ApplicationContext<<interface>> -> BeanFactory<<interface>>
+
+#### BeanFactory
+- 스프링 컨테이너 최상위 인터페이스
+- 스프링 빈을 관리하고 조회하는 역할 담당
+- getBean() 제공
+
+#### ApplicationContext
+- BeanFactory 기능을 모두 상속받아서 제공
+- 애플리케이션을 개발할 때는 빈은 관리하고 조회하는 기능은 물론, 많은 부가기능이 필요함
+  - MessageSource: 메시지 소스를 활용한 국제화 기능
+  - EnvironmentCapable: 로컬, 개발, 운영 구분 처리
+  - ApplicationEventPublisher: 이벤트 발행하고 구독하는 모델을 편리하게 지원
+  - ResourceLoader: 파일, 클래스패스, 외부 등에서 리소스를 편리하게 조회
+
+- ApplicationContext 는 BeanFactory 기능을 상속받음
+- ApplicationContext 는 빈 관리기능, 편리한 부가 기능 제공
+- BeanFactory 를 직접 사용할 일은 거의 없음. 부가기능 포함된 ApplicationContext 사용
+- BeanFactory 나 ApplicationContext를 스프링 컨테이너라고 함
+
+#### 스프링 빈 설정 메타 정보 - BeanDefinition
+- 스프링의 다양한 설정 형식 지원이 가능한 이유는 BeanDefinition이라는 추상화가 있기 때문
+- **"역할과 구현을 개념적으로 나눈 것"**
+  - XML을 읽어서 BeanDefinition 으로 만듦
+  - 자바 코드를 읽어서 BeanDefinition 으로 만듦
+  - 스플이 컨테이너는 자바코드인지 XML인지 알 필요 없음. BeanDefinition 만 알면 됨.
+- BeanDefinition 을  빈 설정 메타정보라고 함
+  - @Bean, <bean> 당 각각 하나씩 메타정보가 생성됨
+- 스프링 컨테이너는 메타정보를 기반으로 스프링 빈을 생성함
+
+- AnnotationConfigApplicationContext 는 AnnotationDBeanDefinitionReader 를 사용해서 AppConfig.class 를 읽고 BeanDefinition 생성
+- 새로운 형식의 설정 정보가 추가되면 XxxBeanDefinitionReader를 만들어서 BeanDefinition를 생성하면 됨
+
+- BeanDefinition 를 직접 생성해서 스프링 컨테이너에 등록할 수도 있지만 그럴 일은 거의 없음
+- 기본적으로 FactoryBean을 통해서 등록함
