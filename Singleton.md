@@ -39,3 +39,28 @@
   - 필드 대신 자바에서 공유되지 않는 지역 변수, 파라미터, ThreadLocal 등을 사용해야 함
 - 스프링 빈의 필드에 공유 값을 설정하면 큰 장애가 발생할 수 있음
 
+
+### @Configuration과 바이트코드 조작
+- 스프링 컨테이너는 싱글톤 레지스트리임. 스프링 빈이 싱글톤이 되도록 보장해줘야 함. 하지만 자바 코드까지 관리해주기는 어려움. 
+  - => 클래스의 바이트코드를 조작하는 라이브러리를 사용함
+  ![img_1.png](img_1.png)
+    
+#### 예상 AppConfig@CGLIB 코드
+```java
+@Bean
+public MemberRepository memberRepository() {
+    if (MemoryMemberReopository가 이미 스프링 컨테이너에 등록되어 있다면) {
+        return 스프링 컨테이너에서 찾아서 반환;
+    } else {
+        기존 로직을 호출해서 MemoryMemberRepository를 생성하고 스프링 컨테이너에 등록
+        return 반환;
+    }   
+}
+```
+- @Bean이 붙은 메서드마다 이미 스프링 빈이 존재하면 존재하는 빈을 반환하고, 스프링 빈이 없으면 생성해서 빈으로 등록 후 반환하는 코드가 동적으로 만들어짐
+  - 싱글톤 보장
+  
+### @Configuration을 적용하지 않고 @Bean만 적용한다면?
+- 바이트코드를 조작하는 CGLIB 기술을 사용해서 싱글톤을 보장했지만, CGLIB 기술 없이 순수한 AppConfig로 스프링 빈에 등록이 되어버림
+- @Bean만 사용하면 스프링 빈에는 등록이 되지만, 싱글톤을 보장할 수 없음
+=> 스프링 설정 정보에는 항상 @Configuration 을 사용하자
